@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package config;
+
+// TODO: change the name of this service
+service Write {
+    rpc writeConfig (ConfigMsg) returns (Success);
+    rpc getUeLogs (UeLogRequest) returns (stream UeLogs);
+    rpc streamUeLogs (Empty) returns (stream UeLogs);
+}
+
+message Empty {
+}
+
+// Parts of Config Msg
+
+// TODO: get the config msg right
+message ConfigMsg {
+    // TODO: break down log levels for each layer
+    string logOptions = 1;
+    string logFilename = 2;
+
+    string commAddr = 3; // ws socket addr
+    
+    // CN config
+    message MmeConfig {
+        string mmeIpAddr = 1;
+    }
+    repeated MmeConfig mmeList = 4;
+    string gtpAddr = 5;
+
+    // eNB config
+    string enbId = 6;
+    message CellConfig {
+        string cellId = 1;
+        string tac = 2;
+        int32 nIdCell = 3;
+        int32 rootSequenceIndex = 4;
+        int32 dlEarfcn = 5;
+        int32 nAntennaDl = 6;
+        int32 nAntennaUl = 7;
+        int32 nRbDl = 8;
+        message PlmnConfig {
+            string plmnId = 1;
+        }
+        repeated PlmnConfig plmnList = 9;
+        int32 rfPort = 10;
+        int32 ulDlConfig = 11;
+        int32 spConfig = 12;
+        message ScellConfig {
+            string cellId = 1;
+            bool crossCarrierScheduling = 2;
+        }
+        repeated ScellConfig scellList = 13;
+    }
+    repeated CellConfig cellList = 7;
+
+}
+
+message Success {
+    bool status = 1;
+}
+
+message UeLogRequest {
+    int32 nbLogs = 1;
+}
+
+message UeData {
+    int32   dlRate = 1;
+    int32   ulRate = 2;
+}
+
+message UeLogs {
+    int32 time = 1;
+    UeData ueData= 2;
+}
